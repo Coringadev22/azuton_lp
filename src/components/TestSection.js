@@ -4,138 +4,150 @@ import './TestSection.css';
 const TestSection = () => {
   const [activeTab, setActiveTab] = useState('hd-voice');
   const [isCalling, setIsCalling] = useState(false);
+  const [isInCall, setIsInCall] = useState(false);
 
   const handleCall = async () => {
     if (isCalling) return;
     
+    // Se já está em chamada, desliga
+    if (isInCall) {
+      handleEndCall();
+      return;
+    }
+    
     setIsCalling(true);
     
     try {
-      console.log('Procurando botão circular do Vapi...');
+      console.log('Botão LIGAR AGORA: Procurando botão circular do Vapi...');
       
       // Aguarda um pouco para o botão circular aparecer
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Procura pelo botão circular do Vapi
-      const vapiButtonSelectors = [
-        'button[data-vapi-widget]',
-        '.vapi-widget-button',
-        'button[style*="position: fixed"]',
-        'button[style*="bottom"]',
-        'button[style*="right"]',
-        'button[class*="vapi"]',
-        'button[class*="call"]'
-      ];
-      
+      // Procura pelo botão circular do Vapi que funciona
       let vapiButton = null;
       
-      // Tenta encontrar o botão circular
-      for (const selector of vapiButtonSelectors) {
-        vapiButton = document.querySelector(selector);
-        if (vapiButton) {
-          console.log('Botão Vapi encontrado:', vapiButton);
+      // Busca por todos os botões na página
+      const allButtons = document.querySelectorAll('button');
+      console.log('Total de botões encontrados:', allButtons.length);
+      
+      for (const button of allButtons) {
+        // Pula o botão atual (LIGAR AGORA)
+        if (button.textContent.includes('LIGAR AGORA') || 
+            button.textContent.includes('CONECTANDO') ||
+            button.textContent.includes('DESLIGAR')) {
+          continue;
+        }
+        
+        const style = window.getComputedStyle(button);
+        const position = style.position;
+        const bottom = style.bottom;
+        const right = style.right;
+        const width = style.width;
+        const height = style.height;
+        
+        // Botão circular pequeno fixo (provavelmente o Vapi)
+        if (position === 'fixed' && 
+            (bottom.includes('px') || right.includes('px')) &&
+            width === height && 
+            parseInt(width) < 100 &&
+            parseInt(width) > 40) {
+          vapiButton = button;
+          console.log('Botão circular Vapi encontrado:', button);
           break;
         }
       }
       
-      // Se não encontrou com seletores, busca por posição
-      if (!vapiButton) {
-        console.log('Buscando botão por posição...');
-        const allButtons = document.querySelectorAll('button');
-        for (const button of allButtons) {
-          const style = window.getComputedStyle(button);
-          const position = style.position;
-          const bottom = style.bottom;
-          const right = style.right;
-          
-          // Botão fixo no canto inferior direito
-          if (position === 'fixed' && (bottom.includes('px') || right.includes('px'))) {
-            vapiButton = button;
-            console.log('Botão encontrado por posição:', button);
-            break;
-          }
-        }
-      }
-      
-      // Se não encontrou, busca por atributos
-      if (!vapiButton) {
-        console.log('Buscando botão por atributos...');
-        const allButtons = document.querySelectorAll('button');
-        for (const button of allButtons) {
-          // Verifica se tem atributos relacionados ao Vapi
-          if (button.hasAttribute('data-vapi') || 
-              button.className.includes('vapi') ||
-              button.id.includes('vapi') ||
-              button.getAttribute('aria-label')?.includes('call') ||
-              button.getAttribute('title')?.includes('call')) {
-            vapiButton = button;
-            console.log('Botão encontrado por atributos:', button);
-            break;
-          }
-        }
-      }
-      
-      // Se ainda não encontrou, busca por elementos que não sejam o botão atual
-      if (!vapiButton) {
-        console.log('Buscando botão circular específico...');
-        const allButtons = document.querySelectorAll('button');
-        for (const button of allButtons) {
-          // Pula o botão atual (LIGAR AGORA)
-          if (button.textContent.includes('LIGAR AGORA') || 
-              button.textContent.includes('CONECTANDO')) {
-            continue;
-          }
-          
-          const style = window.getComputedStyle(button);
-          const position = style.position;
-          const bottom = style.bottom;
-          const right = style.right;
-          const width = style.width;
-          const height = style.height;
-          
-          // Botão circular pequeno (provavelmente o Vapi)
-          if (position === 'fixed' && 
-              (bottom.includes('px') || right.includes('px')) &&
-              width === height && 
-              parseInt(width) < 100) {
-            vapiButton = button;
-            console.log('Botão circular encontrado:', button);
-            break;
-          }
-        }
-      }
-      
       if (vapiButton) {
+        console.log('Clicando no botão circular do Vapi...');
         vapiButton.click();
         console.log('Botão circular Vapi clicado com sucesso!');
-      } else {
-        console.log('Botão Vapi não encontrado, tentando usar SDK diretamente...');
         
-        // Fallback: usar SDK diretamente
-        if (window.vapiReady && window.vapiSDK) {
-          const vapiInstance = window.vapiSDK.run({
-            apiKey: "5bf919cf-4f0b-4219-ab02-74722fbc0eb5",
-            assistant: "3a43dfa8-674a-4976-964b-c6729ecccad3",
-            config: {
-              position: "bottom-right",
-              size: "small",
-              theme: "light",
-              offset: "20px"
-            }
-          });
-          
-          await vapiInstance.start();
-          console.log('Chamada iniciada via SDK!');
-        } else {
-          throw new Error('Botão circular do Vapi não encontrado e SDK não disponível');
+        // Marca como em chamada após 2 segundos
+        setTimeout(() => {
+          setIsInCall(true);
+          setIsCalling(false);
+          console.log('Estado alterado para: em chamada');
+        }, 2000);
+        
+      } else {
+        console.log('Botão circular não encontrado, tentando buscar por outros seletores...');
+        
+        // Busca por seletores específicos do Vapi
+        const vapiSelectors = [
+          'button[data-vapi-widget]',
+          '.vapi-widget-button',
+          'button[style*="position: fixed"]',
+          'button[style*="bottom"]',
+          'button[style*="right"]',
+          'button[class*="vapi"]',
+          'button[class*="call"]'
+        ];
+        
+        for (const selector of vapiSelectors) {
+          const button = document.querySelector(selector);
+          if (button && !button.textContent.includes('LIGAR AGORA')) {
+            console.log('Botão encontrado com seletor:', selector, button);
+            button.click();
+            console.log('Botão clicado com sucesso via seletor!');
+            
+            // Marca como em chamada
+            setTimeout(() => {
+              setIsInCall(true);
+              setIsCalling(false);
+              console.log('Estado alterado para: em chamada');
+            }, 2000);
+            return;
+          }
         }
+        
+        throw new Error('Botão circular do Vapi não encontrado');
       }
       
     } catch (error) {
       console.error('Erro ao iniciar chamada:', error);
-      alert(`Erro ao conectar com o agente: ${error.message}`);
-    } finally {
-      setTimeout(() => setIsCalling(false), 3000);
+      console.error('Erro completo:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      alert(`Erro ao conectar com o agente: ${error.message || 'Erro desconhecido'}`);
+      setIsCalling(false);
+    }
+  };
+
+  const handleEndCall = async () => {
+    try {
+      console.log('Desligando chamada...');
+      
+      // Procura pelo botão de desligar ou fecha a interface
+      if (window.vapiInstance) {
+        // Tenta usar o método stop se disponível
+        if (window.vapiInstance.stop) {
+          await window.vapiInstance.stop();
+          console.log('Chamada desligada via stop()');
+        } else if (window.vapiInstance.end) {
+          await window.vapiInstance.end();
+          console.log('Chamada desligada via end()');
+        } else {
+          console.log('Método de desligar não encontrado');
+        }
+      }
+      
+      // Procura por botão de fechar/desligar na interface
+      const closeButtons = document.querySelectorAll('button[aria-label*="close"], button[title*="close"], button[aria-label*="end"], button[title*="end"]');
+      for (const button of closeButtons) {
+        button.click();
+        console.log('Botão de fechar clicado');
+        break;
+      }
+      
+      setIsInCall(false);
+      console.log('Estado alterado para: não em chamada');
+      
+    } catch (error) {
+      console.error('Erro ao desligar:', error);
+      // Mesmo com erro, marca como não em chamada
+      setIsInCall(false);
     }
   };
 
@@ -163,12 +175,14 @@ const TestSection = () => {
               <button className="option-btn">Codec padrão</button>
             </div>
             <button 
-              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''}`} 
+              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''} ${isInCall ? 'in-call' : ''}`} 
               onClick={handleCall}
               disabled={isCalling}
             >
-              <span className="btn-icon">{isCalling ? '⏳' : '📞'}</span>
-              {isCalling ? 'CONECTANDO...' : 'LIGAR AGORA'}
+              <span className="btn-icon">
+                {isCalling ? '⏳' : isInCall ? '📵' : '📞'}
+              </span>
+              {isCalling ? 'CONECTANDO...' : isInCall ? 'DESLIGAR' : 'LIGAR AGORA'}
             </button>
           </div>
         );
@@ -223,12 +237,14 @@ const TestSection = () => {
               </button>
             </div>
             <button 
-              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''}`} 
+              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''} ${isInCall ? 'in-call' : ''}`} 
               onClick={handleCall}
               disabled={isCalling}
             >
-              <span className="btn-icon">{isCalling ? '⏳' : '📞'}</span>
-              {isCalling ? 'CONECTANDO...' : 'LIGAR AGORA'}
+              <span className="btn-icon">
+                {isCalling ? '⏳' : isInCall ? '📵' : '📞'}
+              </span>
+              {isCalling ? 'CONECTANDO...' : isInCall ? 'DESLIGAR' : 'LIGAR AGORA'}
             </button>
           </div>
         );

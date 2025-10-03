@@ -17,17 +17,20 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     
-    <!-- Vapi SDK -->
+    <!-- Vapi SDK - Formato oficial da documentação -->
     <script>
-      window.vapiSDK = null;
+      var vapiInstance = null;
+      const assistant = "3a43dfa8-674a-4976-964b-c6729ecccad3";
+      const apiKey = "5bf919cf-4f0b-4219-ab02-74722fbc0eb5";
+      const buttonConfig = {
+        position: "bottom-right",
+        size: "small",
+        theme: "light",
+        offset: "20px"
+      };
+
       window.vapiReady = false;
-      
-      // Listener para quando o Vapi estiver pronto
-      window.addEventListener('vapiReady', function() {
-        console.log('Vapi SDK está pronto!');
-        window.vapiReady = true;
-      });
-      
+
       (function (d, t) {
         var g = document.createElement(t),
           s = d.getElementsByTagName(t)[0];
@@ -35,11 +38,30 @@
         g.defer = true;
         g.async = true;
         s.parentNode.insertBefore(g, s);
+
         g.onload = function () {
           console.log('Vapi SDK carregado');
-          window.vapiSDK = window.vapiSDK || window.vapi;
+          vapiInstance = window.vapiSDK.run({
+            apiKey: apiKey, // mandatory
+            assistant: assistant, // mandatory
+            config: buttonConfig, // optional
+          });
           console.log('Vapi SDK disponível:', window.vapiSDK);
+          console.log('Vapi Instance criada:', vapiInstance);
+          
+          // Expõe a instância globalmente
+          window.vapiInstance = vapiInstance;
+          window.vapiReady = true;
           window.dispatchEvent(new Event('vapiReady'));
+          
+          // Esconde o botão circular do Vapi
+          setTimeout(() => {
+            const vapiButton = document.querySelector('button[style*="position: fixed"]');
+            if (vapiButton) {
+              vapiButton.style.display = 'none';
+              console.log('Botão circular do Vapi escondido');
+            }
+          }, 1000);
         };
       })(document, "script");
     </script>
