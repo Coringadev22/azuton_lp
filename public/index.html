@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://lp.azuton.com/wp-content/uploads/2024/07/cropped-Favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Azuton - PABX Virtual com IA de voz. Atendimento imediato, humano e sem fila."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Azuton - PABX Virtual com IA de Voz</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    
+    <!-- Vapi SDK -->
+    <script>
+      window.vapiSDK = null;
+      window.vapiReady = false;
+      
+      // Listener para quando o Vapi estiver pronto
+      window.addEventListener('vapiReady', function() {
+        console.log('Vapi SDK está pronto!');
+        window.vapiReady = true;
+      });
+      
+      (function (d, t) {
+        var g = document.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+        g.src = "https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js";
+        g.defer = true;
+        g.async = true;
+        s.parentNode.insertBefore(g, s);
+        g.onload = function () {
+          console.log('Vapi SDK carregado');
+          window.vapiSDK = window.vapiSDK || window.vapi;
+          console.log('Vapi SDK disponível:', window.vapiSDK);
+          window.dispatchEvent(new Event('vapiReady'));
+        };
+      })(document, "script");
+    </script>
+  </body>
+</html>

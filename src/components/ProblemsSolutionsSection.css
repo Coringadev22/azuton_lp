@@ -1,0 +1,294 @@
+.problems-solutions-section {
+  padding: 80px 0;
+}
+
+.problems-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.problems-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.illustration-circle {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.illustration-woman {
+  position: absolute;
+  width: 80px;
+  height: 120px;
+}
+
+.illustration-woman.agent {
+  left: 20%;
+  top: 30%;
+}
+
+.illustration-woman.customer {
+  right: 20%;
+  bottom: 30%;
+}
+
+.woman-head {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fdbcb4;
+  margin: 0 auto 5px;
+  position: relative;
+}
+
+.woman-body {
+  width: 50px;
+  height: 70px;
+  border-radius: 25px;
+  margin: 0 auto;
+}
+
+.agent .woman-body {
+  background: #55efc4;
+}
+
+.customer .woman-body {
+  background: #74b9ff;
+}
+
+.headset {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 20px;
+  background: #2d3436;
+  border-radius: 15px 15px 0 0;
+}
+
+.phone {
+  position: absolute;
+  top: 10px;
+  right: -10px;
+  width: 20px;
+  height: 30px;
+  background: #636e72;
+  border-radius: 3px;
+}
+
+.speech-bubble {
+  position: absolute;
+  top: -30px;
+  left: 50px;
+  width: 60px;
+  height: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+.plant {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 40px;
+  background: #00b894;
+  border-radius: 15px 15px 0 0;
+}
+
+.plant::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  background: #00b894;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+.floating-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.shape-1 {
+  width: 20px;
+  height: 20px;
+  top: 15%;
+  left: 15%;
+  animation: float 3s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 15px;
+  height: 15px;
+  top: 20%;
+  right: 20%;
+  animation: float 3s ease-in-out infinite 1s;
+}
+
+.shape-3 {
+  width: 25px;
+  height: 25px;
+  bottom: 25%;
+  left: 25%;
+  animation: float 3s ease-in-out infinite 2s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.problems-list {
+  padding-left: 20px;
+}
+
+.problems-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 40px;
+  line-height: 1.3;
+}
+
+.problems-grid {
+  margin-bottom: 40px;
+}
+
+.problem-item {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #00d4aa;
+}
+
+.problem-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+}
+
+.problem-solution {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.problems-cta {
+  margin-top: 40px;
+}
+
+.btn-large {
+  padding: 18px 36px;
+  font-size: 18px;
+}
+
+@media (max-width: 1024px) {
+  .problems-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+  
+  .problems-list {
+    padding-left: 0;
+  }
+  
+  .illustration-circle {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .problems-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .problems-solutions-section {
+    padding: 60px 0;
+  }
+  
+  .illustration-circle {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .illustration-woman {
+    width: 60px;
+    height: 90px;
+  }
+  
+  .woman-head {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .woman-body {
+    width: 40px;
+    height: 55px;
+  }
+  
+  .problems-title {
+    font-size: 1.6rem;
+  }
+  
+  .problem-item {
+    padding: 15px;
+  }
+  
+  .problem-title {
+    font-size: 1.1rem;
+  }
+  
+  .problem-solution {
+    font-size: 0.9rem;
+  }
+  
+  .btn-large {
+    padding: 15px 30px;
+    font-size: 16px;
+  }
+}
