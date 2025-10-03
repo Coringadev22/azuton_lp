@@ -34,6 +34,7 @@
 }
 
 .test-tab {
+  font-family: 'Space Grotesk', sans-serif;
   background: none;
   border: none;
   padding: 15px 30px;
@@ -92,6 +93,7 @@
 }
 
 .test-title {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: #666;
@@ -101,14 +103,18 @@
 }
 
 .test-subtitle {
+  font-family: 'Inter', sans-serif;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #1a1a2e;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .test-description {
+  font-family: 'Inter', sans-serif;
   font-size: 1.1rem;
+  font-weight: 400;
   color: #666;
   line-height: 1.6;
   margin-bottom: 30px;
@@ -118,11 +124,12 @@
 }
 
 .test-highlight {
+  font-family: 'Inter', sans-serif;
   font-size: 1.2rem;
+  font-weight: 500;
   color: #00d4aa;
   font-style: italic;
   margin-bottom: 30px;
-  font-weight: 500;
 }
 
 .test-options {
@@ -133,6 +140,7 @@
 }
 
 .option-btn {
+  font-family: 'Inter', sans-serif;
   padding: 12px 24px;
   border: 2px solid #ddd;
   background: white;
@@ -203,8 +211,10 @@
 }
 
 .btn-large {
+  font-family: 'Space Grotesk', sans-serif;
   padding: 18px 36px;
   font-size: 18px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214,12 +224,54 @@
   box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4);
   border: 2px solid #00d4aa;
   color: #333;
-  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-large:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 35px rgba(0, 212, 170, 0.5);
+}
+
+/* Importar fontes modernas */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Mover botão Vapi para baixo (discreto mas funcional) */
+button[class*="vapi"],
+.vapi-btn,
+#vapi-support-btn,
+button[title*="Have a quick question"],
+button[class*="vapi-btn"] {
+  position: fixed !important;
+  bottom: 10px !important;
+  left: 10px !important;
+  z-index: 9999 !important;
+  opacity: 0.5 !important;
+  pointer-events: auto !important;
+  transform: scale(0.8) !important;
+  transition: all 0.3s ease !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Estados do botão LIGAR AGORA */
+.btn-large.calling {
+  background: #f8f9fa;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.btn-large.in-call {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-large.in-call:hover {
+  background: #c82333;
+  border-color: #bd2130;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(220, 53, 69, 0.5);
 }
 
 @media (max-width: 768px) {

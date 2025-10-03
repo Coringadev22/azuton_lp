@@ -23,7 +23,7 @@
       const assistant = "3a43dfa8-674a-4976-964b-c6729ecccad3";
       const apiKey = "5bf919cf-4f0b-4219-ab02-74722fbc0eb5";
       const buttonConfig = {
-        position: "bottom-right",
+        position: "bottom-left",
         size: "small",
         theme: "light",
         offset: "20px"
@@ -54,14 +54,227 @@
           window.vapiReady = true;
           window.dispatchEvent(new Event('vapiReady'));
           
-          // Esconde o botão circular do Vapi
+          // Adiciona listeners para eventos do Vapi
+          if (window.vapiInstance && window.vapiInstance.on) {
+            window.vapiInstance.on('call-start', () => {
+              console.log('Evento: Chamada iniciada');
+              window.dispatchEvent(new Event('vapiCallStarted'));
+            });
+            
+            window.vapiInstance.on('call-end', () => {
+              console.log('Evento: Chamada finalizada');
+              window.dispatchEvent(new Event('vapiCallEnded'));
+            });
+            
+            window.vapiInstance.on('speech-start', () => {
+              console.log('Evento: Fala iniciada');
+            });
+            
+            window.vapiInstance.on('speech-end', () => {
+              console.log('Evento: Fala finalizada');
+            });
+          }
+          
+          // Move o botão circular do Vapi para baixo
           setTimeout(() => {
-            const vapiButton = document.querySelector('button[style*="position: fixed"]');
-            if (vapiButton) {
-              vapiButton.style.display = 'none';
-              console.log('Botão circular do Vapi escondido');
-            }
+            moveVapiButtonToBottom();
           }, 1000);
+          
+          // Verifica periodicamente para manter o botão na parte inferior
+          setInterval(() => {
+            moveVapiButtonToBottom();
+          }, 3000);
+          
+          // Função para mover o botão do Vapi para baixo
+          window.moveVapiButtonToBottom = function() {
+            const vapiButtonSelectors = [
+              '#vapi-support-btn',
+              '.vapi-btn',
+              'button[class*="vapi"]',
+              'button[title*="Have a quick question"]',
+              'button[class*="vapi-btn"]'
+            ];
+            
+            vapiButtonSelectors.forEach(selector => {
+              const buttons = document.querySelectorAll(selector);
+              buttons.forEach(button => {
+                // Move o botão para baixo mas mantém funcionalidade
+                button.style.position = 'fixed';
+                button.style.bottom = '10px';
+                button.style.left = '10px';
+                button.style.zIndex = '9999';
+                button.style.opacity = '0.5';
+                button.style.pointerEvents = 'auto';
+                button.style.transform = 'scale(0.8)';
+                button.style.transition = 'all 0.3s ease';
+                
+                console.log('Botão Vapi movido para baixo:', button);
+              });
+            });
+          };
+
+          // Função para iniciar chamada diretamente via SDK
+          window.startVapiCall = function() {
+            return new Promise((resolve, reject) => {
+              if (!window.vapiInstance) {
+                reject(new Error('Vapi instance não disponível'));
+                return;
+              }
+
+              console.log('Iniciando chamada via SDK...');
+              
+              // Tenta iniciar a chamada diretamente
+              if (window.vapiInstance.start) {
+                window.vapiInstance.start()
+                  .then(() => {
+                    console.log('Chamada iniciada via start()');
+                    resolve(true);
+                  })
+                  .catch(error => {
+                    console.error('Erro ao iniciar via start():', error);
+                    reject(error);
+                  });
+              } else if (window.vapiInstance.call) {
+                window.vapiInstance.call()
+                  .then(() => {
+                    console.log('Chamada iniciada via call()');
+                    resolve(true);
+                  })
+                  .catch(error => {
+                    console.error('Erro ao iniciar via call():', error);
+                    reject(error);
+                  });
+              } else {
+                // Fallback: clica no botão circular
+                console.log('Tentando fallback: clicar no botão circular...');
+                const vapiButton = document.querySelector('#vapi-support-btn, .vapi-btn, button[class*="vapi"]');
+                if (vapiButton) {
+                  vapiButton.click();
+                  setTimeout(() => resolve(true), 1000);
+                } else {
+                  reject(new Error('Botão do Vapi não encontrado'));
+                }
+              }
+            });
+          };
+
+          // Função para esconder o botão circular (mantida para compatibilidade)
+          window.hideVapiButton = function() {
+            // Procura especificamente pelo botão do Vapi
+            const vapiButtonSelectors = [
+              '#vapi-support-btn',
+              '.vapi-btn',
+              'button[class*="vapi"]',
+              'button[title*="Have a quick question"]',
+              'button[class*="vapi-btn"]'
+            ];
+            
+            let hiddenCount = 0;
+            
+            vapiButtonSelectors.forEach(selector => {
+              const buttons = document.querySelectorAll(selector);
+              buttons.forEach(button => {
+                // Múltiplas estratégias para esconder
+                button.style.display = 'none !important';
+                button.style.visibility = 'hidden !important';
+                button.style.opacity = '0 !important';
+                button.style.zIndex = '-9999 !important';
+                button.style.pointerEvents = 'none !important';
+                button.style.position = 'absolute !important';
+                button.style.left = '-9999px !important';
+                button.style.top = '-9999px !important';
+                
+                // Tenta remover o elemento completamente
+                try {
+                  button.remove();
+                  console.log('Botão Vapi removido:', selector, button);
+                  hiddenCount++;
+                } catch (e) {
+                  console.log('Botão Vapi escondido:', selector, button);
+                  hiddenCount++;
+                }
+              });
+            });
+            
+            // Se não encontrou pelos seletores específicos, procura por todos os botões
+            if (hiddenCount === 0) {
+              const allButtons = document.querySelectorAll('button');
+              
+              allButtons.forEach(button => {
+                const style = window.getComputedStyle(button);
+                const position = style.position;
+                const bottom = style.bottom;
+                const right = style.right;
+                const width = style.width;
+                const height = style.height;
+                const text = button.textContent || '';
+                const className = button.className || '';
+                const id = button.id || '';
+                
+                // Se é um botão fixo circular pequeno (provavelmente o Vapi)
+                if ((position === 'fixed' && 
+                     (bottom.includes('px') || right.includes('px')) &&
+                     width === height && 
+                     parseInt(width) < 100 &&
+                     parseInt(width) > 40) ||
+                    className.includes('vapi') ||
+                    id.includes('vapi')) {
+                  
+                  if (!text.includes('LIGAR AGORA') &&
+                      !text.includes('CONECTANDO') &&
+                      !text.includes('DESLIGAR')) {
+                    
+                    // Múltiplas estratégias para esconder
+                    button.style.display = 'none !important';
+                    button.style.visibility = 'hidden !important';
+                    button.style.opacity = '0 !important';
+                    button.style.zIndex = '-9999 !important';
+                    button.style.pointerEvents = 'none !important';
+                    button.style.position = 'absolute !important';
+                    button.style.left = '-9999px !important';
+                    button.style.top = '-9999px !important';
+                    
+                    // Tenta remover o elemento completamente
+                    try {
+                      button.remove();
+                      console.log('Botão circular do Vapi removido completamente');
+                      hiddenCount++;
+                    } catch (e) {
+                      console.log('Botão circular do Vapi escondido (não removido):', button);
+                      hiddenCount++;
+                    }
+                  }
+                }
+              });
+            }
+            
+            if (hiddenCount > 0) {
+              console.log(`Total de botões Vapi escondidos: ${hiddenCount}`);
+            }
+            
+            // Adiciona CSS global para esconder qualquer botão circular do Vapi
+            const style = document.createElement('style');
+            style.textContent = `
+              button[style*="position: fixed"][style*="bottom"],
+              button[style*="position: fixed"][style*="right"],
+              button[style*="position: fixed"],
+              button[class*="vapi"],
+              .vapi-btn,
+              #vapi-support-btn,
+              button[title*="Have a quick question"],
+              button[class*="vapi-btn"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                z-index: -9999 !important;
+                pointer-events: none !important;
+                position: absolute !important;
+                left: -9999px !important;
+                top: -9999px !important;
+              }
+            `;
+            document.head.appendChild(style);
+          };
         };
       })(document, "script");
     </script>

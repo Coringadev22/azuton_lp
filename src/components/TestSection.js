@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TestSection.css';
 
 const TestSection = () => {
   const [activeTab, setActiveTab] = useState('hd-voice');
   const [isCalling, setIsCalling] = useState(false);
   const [isInCall, setIsInCall] = useState(false);
+
+  // Move o botão circular para baixo quando o componente carregar
+  useEffect(() => {
+    const moveButton = () => {
+      if (window.moveVapiButtonToBottom) {
+        window.moveVapiButtonToBottom();
+      }
+    };
+
+    // Move imediatamente
+    moveButton();
+    
+    // Move a cada 3 segundos
+    const interval = setInterval(moveButton, 3000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCall = async () => {
     if (isCalling) return;
@@ -15,10 +32,36 @@ const TestSection = () => {
       return;
     }
     
+    // Move o botão circular para baixo antes de iniciar (não esconde completamente)
+    if (window.moveVapiButtonToBottom) {
+      window.moveVapiButtonToBottom();
+    }
+    
     setIsCalling(true);
     
     try {
-      console.log('Botão LIGAR AGORA: Procurando botão circular do Vapi...');
+      console.log('Botão LIGAR AGORA: Tentando iniciar chamada...');
+      
+      // Tenta usar o SDK diretamente primeiro
+      if (window.startVapiCall) {
+        console.log('Tentando via startVapiCall...');
+        try {
+          await window.startVapiCall();
+          console.log('Chamada iniciada via SDK!');
+          
+          // Marca como em chamada após 2 segundos
+          setTimeout(() => {
+            setIsInCall(true);
+            setIsCalling(false);
+            console.log('Estado alterado para: em chamada');
+          }, 2000);
+          return;
+        } catch (sdkError) {
+          console.log('SDK falhou, tentando fallback:', sdkError);
+        }
+      }
+      
+      console.log('Fallback: Procurando botão circular do Vapi...');
       
       // Aguarda um pouco para o botão circular aparecer
       await new Promise(resolve => setTimeout(resolve, 1000));
