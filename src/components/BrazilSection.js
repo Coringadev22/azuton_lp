@@ -50,8 +50,14 @@ const BrazilSection = () => {
             </div>
             
             <div className="brazil-cta">
-              <button className="btn btn-success btn-large">
-                Fale com um especialista hoje mesmo
+              <button className="btn btn-success btn-large" onClick={() => {
+                // Scroll para a seção de teste onde está o botão LIGAR AGORA
+                const testSection = document.querySelector('.test-section');
+                if (testSection) {
+                  testSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}>
+                LIGUE PARA NOSSO AGENTE
               </button>
             </div>
           </div>

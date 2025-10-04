@@ -17,7 +17,7 @@
 .partners-track {
   display: flex;
   flex-direction: row;
-  transition: transform 0.8s ease-in-out;
+  transition: transform 0.5s ease-in-out; /* Reduzido de 0.8s para 0.5s (mais rápido) */
   width: 200%;
 }
 
@@ -48,12 +48,12 @@
   height: 120px;
   object-fit: contain;
   margin-right: 15px;
-  filter: grayscale(100%);
+  filter: grayscale(0%);
   transition: filter 0.3s ease;
 }
 
 .partner-logo:hover img {
-  filter: grayscale(0%);
+  filter: grayscale(0%) brightness(1.1);
 }
 
 .partner-logo span {

@@ -4,7 +4,7 @@ import TestSection from './components/TestSection';
 import PartnersSection from './components/PartnersSection';
 import CRMIntegrationSection from './components/CRMIntegrationSection';
 import VideoSection from './components/VideoSection';
-import ProblemsSolutionsSection from './components/ProblemsSolutionsSection';
+import DevelopersSection from './components/DevelopersSection';
 import BenefitsSection from './components/BenefitsSection';
 import AZUPhoneResources from './components/AZUPhoneResources';
 import TestimonialsSection from './components/TestimonialsSection';
@@ -21,7 +21,7 @@ function App() {
       <PartnersSection />
       <CRMIntegrationSection />
       <VideoSection />
-      <ProblemsSolutionsSection />
+      <DevelopersSection />
       <BenefitsSection />
       <AZUPhoneResources />
       <TestimonialsSection />

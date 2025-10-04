@@ -32,6 +32,31 @@ const ComparisonTable = () => {
       feature: "Resposta a linguagem livre",
       chatbot: "Fraca",
       aiAgent: "Forte (entende variações naturais)"
+    },
+    {
+      feature: "Capacidade de vendas",
+      chatbot: "Limitada",
+      aiAgent: "Alta (conduz até a conversão)"
+    },
+    {
+      feature: "Escalabilidade",
+      chatbot: "Boa para chats",
+      aiAgent: "Excelente para voz e alto volume"
+    },
+    {
+      feature: "Exige digitação do cliente",
+      chatbot: "Sim",
+      aiAgent: "Não (funciona por comando de voz)"
+    },
+    {
+      feature: "Custo",
+      chatbot: "Baixo",
+      aiAgent: "Médio, com alto retorno"
+    },
+    {
+      feature: "Ideal para",
+      chatbot: "Atendimento digital básico",
+      aiAgent: "Atendimento por voz profissional"
     }
   ];
 

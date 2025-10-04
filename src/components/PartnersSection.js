@@ -18,7 +18,7 @@ const PartnersSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % partners.length);
-    }, 3000);
+    }, 1500); // Reduzido de 3000ms para 1500ms (mais rápido)
 
     return () => clearInterval(interval);
   }, [partners.length]);

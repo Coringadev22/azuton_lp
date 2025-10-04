@@ -274,6 +274,69 @@ button[class*="vapi-btn"] {
   box-shadow: 0 12px 35px rgba(220, 53, 69, 0.5);
 }
 
+/* Estados para Texto para Voz */
+.btn.converting {
+  background: #f8f9fa;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.audio-controls {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.audio-player {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.audio-status {
+  margin: 20px 0;
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #00d4aa;
+}
+
+.playing-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #00d4aa;
+  margin-bottom: 10px;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.form-input {
+  font-family: 'Inter', sans-serif;
+  padding: 12px 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #00d4aa;
+  box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+}
+
+.form-input:disabled {
+  background: #f8f9fa;
+  color: #666;
+  cursor: not-allowed;
+}
+
+
 @media (max-width: 768px) {
   .test-section {
     padding: 60px 0;

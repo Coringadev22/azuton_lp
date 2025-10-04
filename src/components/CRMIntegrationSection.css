@@ -51,12 +51,12 @@
   width: 80px;
   height: 80px;
   object-fit: contain;
-  filter: grayscale(100%);
+  filter: grayscale(0%);
   transition: filter 0.3s ease;
 }
 
 .crm-partner-card:hover .crm-partner-logo img {
-  filter: grayscale(0%);
+  filter: grayscale(0%) brightness(1.1);
 }
 
 .crm-partner-name {

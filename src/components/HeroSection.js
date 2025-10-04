@@ -24,8 +24,14 @@ const HeroSection = () => {
             </div>
             
             <div className="hero-cta">
-              <button className="btn btn-futuristic btn-large" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>
-                <span className="btn-text">Fale com um especialista</span>
+              <button className="btn btn-futuristic btn-large" onClick={() => {
+                // Scroll para a seção de teste onde está o botão LIGAR AGORA
+                const testSection = document.querySelector('.test-section');
+                if (testSection) {
+                  testSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}>
+                <span className="btn-text">LIGUE PARA NOSSO AGENTE</span>
               </button>
             </div>
           </div>

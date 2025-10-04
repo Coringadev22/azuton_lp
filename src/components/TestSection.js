@@ -5,6 +5,12 @@ const TestSection = () => {
   const [activeTab, setActiveTab] = useState('hd-voice');
   const [isCalling, setIsCalling] = useState(false);
   const [isInCall, setIsInCall] = useState(false);
+  
+  // Estados para Texto para Voz
+  const [textInput, setTextInput] = useState('');
+  const [isConverting, setIsConverting] = useState(false);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Move o botão circular para baixo quando o componente carregar
   useEffect(() => {
@@ -194,6 +200,217 @@ const TestSection = () => {
     }
   };
 
+  // Função para converter texto em voz usando Web Speech API (com fallback para Gemini)
+  const handleTextToSpeech = async () => {
+    if (!textInput.trim()) {
+      alert('Por favor, digite uma mensagem para converter em voz.');
+      return;
+    }
+
+    setIsConverting(true);
+
+    try {
+      console.log('Convertendo texto para voz:', textInput);
+      
+      // Usa Web Speech API como padrão
+      if (window.speechSynthesis && window.speechSynthesis.speak) {
+        await convertWithWebSpeech();
+      } else {
+        // Fallback para Google TTS se Web Speech não estiver disponível
+        await convertWithGoogleTTS();
+      }
+
+    } catch (error) {
+      console.error('Erro ao converter texto para voz:', error);
+      alert(`Erro ao converter texto para voz: ${error.message}`);
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  // Função para converter usando Web Speech API
+  const convertWithWebSpeech = () => {
+    return new Promise((resolve, reject) => {
+      const synthesis = window.speechSynthesis;
+      
+      // Para o áudio anterior se estiver tocando
+      synthesis.cancel();
+
+      // Cria um novo utterance
+      const utterance = new SpeechSynthesisUtterance(textInput);
+      
+      // Configurações da voz
+      utterance.lang = 'pt-BR';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      // Tenta usar uma voz em português
+      const voices = synthesis.getVoices();
+      const portugueseVoice = voices.find(voice => 
+        voice.lang.startsWith('pt') || voice.lang.includes('Brazil')
+      );
+      
+      if (portugueseVoice) {
+        utterance.voice = portugueseVoice;
+        console.log('Usando voz em português:', portugueseVoice.name);
+      }
+
+      // Event listeners
+      utterance.onstart = () => {
+        console.log('Iniciando reprodução de áudio');
+        setIsPlaying(true);
+      };
+
+      utterance.onend = () => {
+        console.log('Reprodução de áudio finalizada');
+        setIsPlaying(false);
+        resolve();
+      };
+
+      utterance.onerror = (event) => {
+        console.error('Erro na síntese de voz:', event.error);
+        setIsPlaying(false);
+        reject(new Error(`Erro na síntese: ${event.error}`));
+      };
+
+      // Inicia a síntese
+      synthesis.speak(utterance);
+    });
+  };
+
+  // Função para converter usando API externa (Google Text-to-Speech ou similar)
+  const convertWithExternalAPI = async () => {
+    try {
+      // Para demonstração, vamos usar uma API de TTS gratuita
+      const response = await fetch('https://api.voicerss.org/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          key: 'demo', // Chave demo - para produção usar uma chave real
+          src: textInput,
+          hl: 'pt-br',
+          f: '44khz_16bit_mono',
+          c: 'mp3'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro na API de TTS externa');
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Cria elemento de áudio
+      const audio = new Audio(audioUrl);
+      
+      audio.onplay = () => {
+        console.log('Iniciando reprodução de áudio externo');
+        setIsPlaying(true);
+      };
+
+      audio.onended = () => {
+        console.log('Reprodução de áudio externo finalizada');
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl); // Limpa a URL
+      };
+
+      audio.onerror = (event) => {
+        console.error('Erro na reprodução de áudio externo:', event);
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+        throw new Error('Erro ao reproduzir áudio externo');
+      };
+
+      // Inicia a reprodução
+      await audio.play();
+      
+    } catch (error) {
+      console.error('Erro na API externa:', error);
+      // Se a API externa falhar, tenta novamente com Web Speech
+      console.log('Tentando fallback para Web Speech API...');
+      await convertWithWebSpeech();
+    }
+  };
+
+  // Função para parar o áudio
+  const stopAudio = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+    }
+  };
+
+  // Função alternativa usando Google Text-to-Speech API (com a chave do Gemini fornecida)
+  const convertWithGoogleTTS = async () => {
+    try {
+      // Usando Google Cloud Text-to-Speech API
+      const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': 'AIzaSyAWcHbTlao3QeZ91t28uk4_CUMu_9Li-E0'
+        },
+        body: JSON.stringify({
+          input: { text: textInput },
+          voice: {
+            languageCode: 'pt-BR',
+            name: 'pt-BR-Wavenet-A', // Voz feminina brasileira
+            ssmlGender: 'FEMALE'
+          },
+          audioConfig: {
+            audioEncoding: 'MP3',
+            speakingRate: 0.9,
+            pitch: 0.0,
+            volumeGainDb: 0.0
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na API Google TTS: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const audioData = data.audioContent;
+      
+      // Converte base64 para blob
+      const audioBlob = new Blob([
+        Uint8Array.from(atob(audioData), c => c.charCodeAt(0))
+      ], { type: 'audio/mp3' });
+      
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onplay = () => {
+        console.log('Iniciando reprodução com Google TTS');
+        setIsPlaying(true);
+      };
+
+      audio.onended = () => {
+        console.log('Reprodução com Google TTS finalizada');
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = (event) => {
+        console.error('Erro na reprodução Google TTS:', event);
+        setIsPlaying(false);
+        URL.revokeObjectURL(audioUrl);
+        throw new Error('Erro ao reproduzir áudio Google TTS');
+      };
+
+      await audio.play();
+      
+    } catch (error) {
+      console.error('Erro na Google TTS API:', error);
+      throw error;
+    }
+  };
+
   const tabs = [
     { id: 'hd-voice', label: 'Voz HD IA' },
     { id: 'text-to-speech', label: 'Texto para Voz' },
@@ -240,22 +457,50 @@ const TestSection = () => {
             <p className="test-description">
               Aproveite vozes claras e naturais para uma melhor experiência de chamada com seus clientes.
             </p>
+            
             <div className="test-input">
               <input 
                 type="text" 
                 placeholder="Digite sua mensagem aqui..." 
                 className="form-input"
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                disabled={isConverting}
               />
-              <button className="btn btn-secondary">Converter para Voz</button>
+              <button 
+                className={`btn btn-secondary ${isConverting ? 'converting' : ''}`}
+                onClick={handleTextToSpeech}
+                disabled={isConverting || !textInput.trim()}
+              >
+                <span className="btn-icon">
+                  {isConverting ? '⏳' : '🔊'}
+                </span>
+                {isConverting ? 'CONVERTENDO...' : 'CONVERTER PARA VOZ'}
+              </button>
             </div>
-            <button 
-              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''}`} 
-              onClick={handleCall}
-              disabled={isCalling}
-            >
-              <span className="btn-icon">{isCalling ? '⏳' : '🎤'}</span>
-              {isCalling ? 'CONECTANDO...' : 'LIGAR AGORA'}
-            </button>
+            
+            {/* Controles de áudio */}
+            {audioUrl && (
+              <div className="audio-controls">
+                <audio 
+                  src={audioUrl} 
+                  controls 
+                  className="audio-player"
+                />
+              </div>
+            )}
+            
+            {isPlaying && (
+              <div className="audio-status">
+                <p className="playing-text">🎵 Reproduzindo áudio...</p>
+                <button 
+                  className="btn btn-secondary btn-small"
+                  onClick={stopAudio}
+                >
+                  ⏹️ PARAR
+                </button>
+              </div>
+            )}
           </div>
         );
       
@@ -279,16 +524,6 @@ const TestSection = () => {
                 ENVIAR ARQUIVO
               </button>
             </div>
-            <button 
-              className={`btn btn-primary btn-large ${isCalling ? 'calling' : ''} ${isInCall ? 'in-call' : ''}`} 
-              onClick={handleCall}
-              disabled={isCalling}
-            >
-              <span className="btn-icon">
-                {isCalling ? '⏳' : isInCall ? '📵' : '📞'}
-              </span>
-              {isCalling ? 'CONECTANDO...' : isInCall ? 'DESLIGAR' : 'LIGAR AGORA'}
-            </button>
           </div>
         );
       

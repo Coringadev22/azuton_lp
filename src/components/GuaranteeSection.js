@@ -34,8 +34,14 @@ const GuaranteeSection = () => {
           </div>
           
           <div className="guarantee-cta">
-            <button className="btn btn-primary btn-large">
-              Fale com um especialista
+            <button className="btn btn-primary btn-large" onClick={() => {
+              // Scroll para a seção de teste onde está o botão LIGAR AGORA
+              const testSection = document.querySelector('.test-section');
+              if (testSection) {
+                testSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}>
+              LIGUE PARA NOSSO AGENTE
             </button>
           </div>
         </div>
